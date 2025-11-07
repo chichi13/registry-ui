@@ -1,0 +1,57 @@
+# Build outputs
+.nuxt
+.output
+dist
+.vercel
+.netlify
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lock
+
+# IDE
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated files
+*.min.js
+*.min.css
+CHANGELOG.md
+
+# Coverage
+coverage
+.nyc_output
+
+# Public assets (typically not formatted)
+public/*
+
+# Environment files
+.env
+.env.*
+!.env.example

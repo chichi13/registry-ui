@@ -1,0 +1,104 @@
+{
+  "locale": {
+    "dir": "ltr",
+    "en-US": "English",
+    "fr-FR": "Français"
+  },
+  "site": {
+    "name": "Docker Registry UI"
+  },
+  "themes": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "error": {
+    "return": "Go back",
+    "page-not-found": "Page not found",
+    "unexpected": "An unexpected error occurred",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Unauthorized. Please check your authentication.",
+    "forbidden": "Access forbidden.",
+    "not-found": "Resource not found.",
+    "delete-disabled": "Delete is not enabled on the registry."
+  },
+  "common": {
+    "loading": "Loading...",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "copy": "Copy",
+    "just-now": "Just now",
+    "minutes-ago": "{count}m ago",
+    "hours-ago": "{count}h ago",
+    "days-ago": "{count}d ago"
+  },
+  "actions": {
+    "view-details": "View details",
+    "delete-repository": "Delete repository",
+    "delete-tag": "Delete tag",
+    "copy-digest": "Copy digest",
+    "refresh": "Refresh",
+    "go-to-repositories": "Go to repositories"
+  },
+  "registry": {
+    "repository": {
+      "title": "Repositories",
+      "count": "{count} repository | {count} repositories",
+      "loading": "Loading repositories...",
+      "show-empty": "Show empty repositories",
+      "empty": {
+        "title": "No repositories found",
+        "description": "No repositories are available in the registry yet. Push your first image to get started."
+      },
+      "tags": {
+        "title": "Tags",
+        "count": "{count} tag | {count} tags",
+        "empty": {
+          "title": "No tags found",
+          "description": "This repository has no tags yet."
+        },
+        "loading": "Loading tags..."
+      },
+      "delete": {
+        "title": "Delete Repository",
+        "description": "This action cannot be undone. This will permanently delete the repository '{name}' and all its tags.",
+        "confirm": "Yes, delete repository",
+        "success": "Repository deleted successfully",
+        "error": "Failed to delete repository",
+        "gc-info": "Disk space will be freed during the next garbage collection run."
+      }
+    },
+    "tag": {
+      "delete": {
+        "title": "Delete Tag",
+        "description": "This action cannot be undone. This will permanently delete the tag '{tag}' from repository '{repository}'.",
+        "confirm": "Yes, delete tag",
+        "success": "Tag deleted successfully",
+        "error": "Failed to delete tag",
+        "gc-info": "Disk space will be freed during the next garbage collection run."
+      },
+      "error": {
+        "title": "Failed to Load Tag",
+        "unknown": "An unknown error occurred while loading this tag"
+      },
+      "details": {
+        "layers": "Layers",
+        "pull-command": "Pull Command",
+        "full-digest": "Full Digest",
+        "manifest": "Manifest Details",
+        "schema-version": "Schema Version",
+        "media-type": "Media Type",
+        "config-digest": "Config Digest",
+        "config-size": "Config Size",
+        "config": "Configuration",
+        "architecture": "Architecture",
+        "os": "Operating System",
+        "created": "Created",
+        "load-config": "Load Additional Details",
+        "loading-details": "Loading details..."
+      }
+    }
+  }
+}

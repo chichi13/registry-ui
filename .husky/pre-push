@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Ensure bun is available in PATH
+export PATH="$HOME/.bun/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+echo "Running pre-push checks..."
+
+# Validate production build
+echo "Building for production..."
+bun run build || {
+  echo "Production build failed. Please fix the errors above."
+  exit 1
+}
+
+echo "Pre-push checks passed!"

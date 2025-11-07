@@ -1,0 +1,104 @@
+{
+  "locale": {
+    "dir": "ltr",
+    "en-US": "English",
+    "fr-FR": "Français"
+  },
+  "site": {
+    "name": "Docker Registry UI"
+  },
+  "themes": {
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "error": {
+    "return": "Retour",
+    "page-not-found": "Page non trouvée",
+    "unexpected": "Une erreur inattendue s'est produite",
+    "network": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "unauthorized": "Non autorisé. Veuillez vérifier votre authentification.",
+    "forbidden": "Accès interdit.",
+    "not-found": "Ressource non trouvée.",
+    "delete-disabled": "La suppression n'est pas activée sur le registre."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "copy": "Copier",
+    "just-now": "À l'instant",
+    "minutes-ago": "Il y a {count}min",
+    "hours-ago": "Il y a {count}h",
+    "days-ago": "Il y a {count}j"
+  },
+  "actions": {
+    "view-details": "Voir les détails",
+    "delete-repository": "Supprimer le dépôt",
+    "delete-tag": "Supprimer le tag",
+    "copy-digest": "Copier l'empreinte",
+    "refresh": "Actualiser",
+    "go-to-repositories": "Aller aux dépôts"
+  },
+  "registry": {
+    "repository": {
+      "title": "Dépôts",
+      "count": "{count} dépôt | {count} dépôts",
+      "loading": "Chargement des dépôts...",
+      "show-empty": "Afficher les dépôts vides",
+      "empty": {
+        "title": "Aucun dépôt trouvé",
+        "description": "Aucun dépôt n'est disponible dans le registre. Poussez votre première image pour commencer."
+      },
+      "tags": {
+        "title": "Tags",
+        "count": "{count} tag | {count} tags",
+        "empty": {
+          "title": "Aucun tag trouvé",
+          "description": "Ce dépôt n'a pas encore de tags."
+        },
+        "loading": "Chargement des tags..."
+      },
+      "delete": {
+        "title": "Supprimer le dépôt",
+        "description": "Cette action est irréversible. Cela supprimera définitivement le dépôt '{name}' et tous ses tags.",
+        "confirm": "Oui, supprimer le dépôt",
+        "success": "Dépôt supprimé avec succès",
+        "error": "Échec de la suppression du dépôt",
+        "gc-info": "L'espace disque sera libéré lors du prochain garbage collection."
+      }
+    },
+    "tag": {
+      "delete": {
+        "title": "Supprimer le tag",
+        "description": "Cette action est irréversible. Cela supprimera définitivement le tag '{tag}' du dépôt '{repository}'.",
+        "confirm": "Oui, supprimer le tag",
+        "success": "Tag supprimé avec succès",
+        "error": "Échec de la suppression du tag",
+        "gc-info": "L'espace disque sera libéré lors du prochain garbage collection."
+      },
+      "error": {
+        "title": "Échec du chargement du tag",
+        "unknown": "Une erreur inconnue s'est produite lors du chargement de ce tag"
+      },
+      "details": {
+        "layers": "Couches",
+        "pull-command": "Commande Pull",
+        "full-digest": "Empreinte complète",
+        "manifest": "Détails du manifeste",
+        "schema-version": "Version du schéma",
+        "media-type": "Type de média",
+        "config-digest": "Empreinte de config",
+        "config-size": "Taille de config",
+        "config": "Configuration",
+        "architecture": "Architecture",
+        "os": "Système d'exploitation",
+        "created": "Créé le",
+        "load-config": "Charger les détails supplémentaires",
+        "loading-details": "Chargement des détails..."
+      }
+    }
+  }
+}
