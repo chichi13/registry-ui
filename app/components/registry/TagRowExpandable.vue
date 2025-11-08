@@ -101,7 +101,7 @@
           <!-- Pull Command (middle horizontal space) -->
           <div class="hidden min-w-0 max-w-md flex-1 items-center gap-2 lg:flex">
             <code
-              class="min-w-0 flex-1 truncate rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-900 dark:bg-gray-800 dark:text-white"
+              class="min-w-0 flex-1 truncate rounded border bg-gray-100 px-2 py-1 font-mono text-xs text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
             >
               {{ pullCommand }}
             </code>
@@ -176,7 +176,7 @@
                 type="text"
                 :value="pullCommand"
                 readonly
-                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-900 dark:text-white"
+                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm text-gray-900 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               />
               <Button
                 size="sm"
@@ -201,7 +201,7 @@
                 type="text"
                 :value="tag.digest"
                 readonly
-                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-xs text-gray-900 dark:border-gray-500 dark:bg-gray-900 dark:text-white"
+                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-xs text-gray-900 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               />
               <Button size="sm" variant="ghost" @click="copyToClipboard(tag.digest, 'digest')">
                 <Icon name="heroicons:clipboard-document" class="h-4 w-4" />
