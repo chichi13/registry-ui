@@ -119,18 +119,18 @@ The application will be available at `http://localhost:3000`.
 
 Create a `.env` file in the root directory:
 
-| Variable                   | Required | Default        | Description                                                |
-| -------------------------- | -------- | -------------- | ---------------------------------------------------------- |
-| `NODE_ENV`                 | Yes      | `development`  | Environment mode (`development` or `production`)           |
-| `HOST`                     | Yes      | `127.0.0.1`    | Host to bind                                               |
-| `PORT`                     | Yes      | `3000`         | Port for the application server                            |
-| `REGISTRY_URL`             | Yes      | -              | URL of your Docker Registry V2 API                         |
-| `REGISTRY_USERNAME`        | No       | -              | Username for registry authentication                       |
-| `REGISTRY_PASSWORD`        | No       | -              | Password for registry authentication                       |
-| `REGISTRY_VERIFY_SSL`      | Yes      | `true`         | Verify SSL certificates (MUST be `true` in production)     |
-| `REGISTRY_TOKEN_CACHE_TTL` | Yes      | `300`          | Token cache duration in seconds (60-3600)                  |
-| `ENABLE_USER_LOGGING`      | No       | `false`        | Enable user logging from `X-Forwarded-User` header         |
-| `REGISTRY_PUBLIC_URL`      | No       | `REGISTRY_URL` | This is the URL users should use in "docker pull" commands |
+| Variable                   | Required | Default          | Description                                            |
+| -------------------------- | -------- | ---------------- | ------------------------------------------------------ |
+| `NODE_ENV`                 | Yes      | `development`    | Environment mode (`development` or `production`)       |
+| `HOST`                     | Yes      | `127.0.0.1`      | Host to bind                                           |
+| `PORT`                     | Yes      | `3000`           | Port for the application server                        |
+| `REGISTRY_URL`             | Yes      | -                | URL of your Docker Registry V2 API                     |
+| `REGISTRY_USERNAME`        | No       | -                | Username for registry authentication                   |
+| `REGISTRY_PASSWORD`        | No       | -                | Password for registry authentication                   |
+| `REGISTRY_VERIFY_SSL`      | Yes      | `true`           | Verify SSL certificates (MUST be `true` in production) |
+| `REGISTRY_TOKEN_CACHE_TTL` | Yes      | `300`            | Token cache duration in seconds (60-3600)              |
+| `ENABLE_USER_LOGGING`      | No       | `false`          | Enable user logging from `X-Forwarded-User` header     |
+| `NUXT_PUBLIC_REGISTRY_URL` | No       | `localhost:5000` | Public URL users should use in "docker pull" commands  |
 
 **Example Configuration:**
 
@@ -140,7 +140,7 @@ HOST=127.0.0.1
 PORT=3000
 
 REGISTRY_URL=https://registry.example.com
-REGISTRY_PUBLIC_URL=mypublicregistry.com
+NUXT_PUBLIC_REGISTRY_URL=mypublicregistry.com
 REGISTRY_USERNAME=admin
 REGISTRY_PASSWORD=your-secure-password
 REGISTRY_VERIFY_SSL=true

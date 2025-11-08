@@ -5,9 +5,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      registryUrl:
-        process.env.REGISTRY_PUBLIC_URL ||
-        (process.env.REGISTRY_URL || 'localhost:5000').replace(/^https?:\/\//, ''),
+      // Public registry URL for frontend (docker pull commands)
+      // Override at runtime with NUXT_PUBLIC_REGISTRY_URL env var
+      registryUrl: 'localhost:5000',
       // Log level for client-side logging
       // 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace
       // Default: 1 (error only) in production, 4 (debug) in development

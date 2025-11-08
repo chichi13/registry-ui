@@ -62,8 +62,9 @@ export const envSchema = z.object({
 
   // Public-facing Docker Registry URL for pull commands (without protocol)
   // Example: registry.example.com or registry.example.com:5000
+  // This follows Nuxt convention: NUXT_PUBLIC_* env vars automatically override runtimeConfig.public.*
   // Safe: Input is validated and limited to domain/hostname format, preventing catastrophic backtracking
-  REGISTRY_PUBLIC_URL: z
+  NUXT_PUBLIC_REGISTRY_URL: z
     .string()
     .regex(
       /^[a-z0-9]+([-.][a-z0-9]+)*(\.[a-z]{2,})?(:[0-9]{1,5})?$/,
