@@ -540,7 +540,7 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
       <DialogContent
-        class="fixed left-1/2 top-1/2 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-600 dark:bg-gray-800"
+        class="fixed left-1/2 top-1/2 mx-4 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-600 dark:bg-gray-800 sm:mx-0 sm:p-6"
       >
         <!-- Header -->
         <DialogTitle class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
@@ -572,21 +572,19 @@
             >
               {{ idx + 1 }}.
             </span>
-            <div class="flex-1 space-y-1">
-              <div class="flex items-center gap-2">
-                <Badge
-                  :class="getLayerTypeBadgeClass(step.empty_layer ? 'metadata' : 'filesystem')"
-                  size="sm"
-                >
-                  {{
-                    step.empty_layer
-                      ? $t('registry.tag.details.metadata')
-                      : $t('registry.tag.details.filesystem')
-                  }}
-                </Badge>
-                <span class="font-mono text-xs text-gray-900 dark:text-white">
-                  {{ parseDockerCommand(step.created_by || '') }}
-                </span>
+            <div class="min-w-0 flex-1 space-y-1.5">
+              <Badge
+                :class="getLayerTypeBadgeClass(step.empty_layer ? 'metadata' : 'filesystem')"
+                size="sm"
+              >
+                {{
+                  step.empty_layer
+                    ? $t('registry.tag.details.metadata')
+                    : $t('registry.tag.details.filesystem')
+                }}
+              </Badge>
+              <div class="min-w-0 break-words font-mono text-xs text-gray-900 dark:text-white">
+                {{ parseDockerCommand(step.created_by || '') }}
               </div>
             </div>
           </div>
