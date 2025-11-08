@@ -8,7 +8,7 @@
       </div>
     </main>
 
-    <footer class="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-800">
+    <footer class="border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
       <div
         class="mx-auto max-w-7xl px-4 py-4 text-center text-sm text-gray-600 dark:text-gray-400 sm:px-6 lg:px-8"
       >

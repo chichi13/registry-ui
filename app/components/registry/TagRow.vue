@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between md:gap-4"
+    class="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-600 md:flex-row md:items-center md:justify-between md:gap-4"
   >
     <div class="min-w-0 flex-1 space-y-2">
       <div class="flex flex-wrap items-center gap-2">

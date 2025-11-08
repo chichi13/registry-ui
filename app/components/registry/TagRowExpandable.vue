@@ -156,7 +156,7 @@
       <!-- Normal Content -->
       <div
         v-else
-        class="mt-2 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+        class="mt-2 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-600 dark:bg-gray-800"
       >
         <div class="space-y-4">
           <!-- Pull Command -->
@@ -172,7 +172,7 @@
                 type="text"
                 :value="pullCommand"
                 readonly
-                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-900 dark:text-white"
               />
               <Button
                 size="sm"
@@ -197,7 +197,7 @@
                 type="text"
                 :value="tag.digest"
                 readonly
-                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-xs text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="flex-1 rounded border border-gray-300 bg-white px-3 py-2 font-mono text-xs text-gray-900 dark:border-gray-500 dark:bg-gray-900 dark:text-white"
               />
               <Button size="sm" variant="ghost" @click="copyToClipboard(tag.digest, 'digest')">
                 <Icon name="heroicons:clipboard-document" class="h-4 w-4" />
@@ -270,7 +270,7 @@
                     class="data-[state=closed]:animate-collapse-up data-[state=open]:animate-collapse-down overflow-hidden"
                   >
                     <div
-                      class="mt-2 space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50"
+                      class="mt-2 space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-800/50"
                     >
                       <!-- Dockerfile Command -->
                       <div v-if="getLayerHistoryEntry(index)">
@@ -375,7 +375,7 @@
           <!-- Config Details (Phase 2: On-Demand with Toggle) -->
           <section
             v-if="tag.manifestDetails"
-            class="border-t border-gray-300 pt-4 dark:border-gray-600"
+            class="border-t border-gray-300 pt-4 dark:border-gray-500"
           >
             <!-- Toggle Button -->
             <div class="mb-3 text-center">
@@ -522,7 +522,7 @@
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
       <DialogContent
-        class="fixed left-1/2 top-1/2 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-800"
+        class="fixed left-1/2 top-1/2 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-600 dark:bg-gray-800"
       >
         <!-- Header -->
         <DialogTitle class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
@@ -541,7 +541,7 @@
 
         <!-- Scrollable Build History Content -->
         <div
-          class="max-h-[60vh] space-y-1 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50"
+          class="max-h-[60vh] space-y-1 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-500 dark:bg-gray-900/50"
         >
           <div
             v-for="(step, idx) in tag.configDetails?.history"

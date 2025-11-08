@@ -2,7 +2,7 @@
   <div :class="cardClasses">
     <div
       v-if="$slots.header"
-      class="border-b border-gray-200 px-4 py-3 dark:border-gray-700 sm:px-6"
+      class="border-b border-gray-200 px-4 py-3 dark:border-gray-600 sm:px-6"
     >
       <slot name="header" />
     </div>
@@ -11,7 +11,7 @@
     </div>
     <div
       v-if="$slots.footer"
-      class="border-t border-gray-200 px-4 py-3 dark:border-gray-700 sm:px-6"
+      class="border-t border-gray-200 px-4 py-3 dark:border-gray-600 sm:px-6"
     >
       <slot name="footer" />
     </div>
@@ -37,7 +37,7 @@ const baseClasses = 'rounded-lg bg-white dark:bg-gray-800'
 
 const variantClasses = {
   default: '',
-  bordered: 'border border-gray-200 dark:border-gray-700',
+  bordered: 'border border-gray-200 dark:border-gray-600',
   elevated: 'shadow-md hover:shadow-lg transition-shadow',
 }
 
