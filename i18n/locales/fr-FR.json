@@ -24,23 +24,32 @@
   },
   "common": {
     "loading": "Chargement...",
+    "loading-ellipsis": "...",
     "retry": "Réessayer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "close": "Fermer",
     "copy": "Copier",
+    "copied-to-clipboard": "{item} copié dans le presse-papier !",
     "just-now": "À l'instant",
     "minutes-ago": "Il y a {count}min",
     "hours-ago": "Il y a {count}h",
-    "days-ago": "Il y a {count}j"
+    "days-ago": "Il y a {count}j",
+    "status": {
+      "error": "Erreur",
+      "incomplete": "Incomplet",
+      "complete": "Complet"
+    }
   },
   "actions": {
     "view-details": "Voir les détails",
     "delete-repository": "Supprimer le dépôt",
     "delete-tag": "Supprimer le tag",
     "copy-digest": "Copier l'empreinte",
+    "copy-all": "Tout copier",
     "refresh": "Actualiser",
-    "go-to-repositories": "Aller aux dépôts"
+    "go-to-repositories": "Aller aux dépôts",
+    "toggle-theme": "Changer le thème"
   },
   "registry": {
     "repository": {
@@ -85,8 +94,16 @@
       },
       "details": {
         "layers": "Couches",
+        "layers-count": "{count} couche | {count} couches",
+        "layer": "Couche",
         "pull-command": "Commande Pull",
         "full-digest": "Empreinte complète",
+        "dockerfile-command": "Commande Dockerfile",
+        "type": "Type",
+        "filesystem-layer": "Couche de système de fichiers",
+        "filesystem": "Système de fichiers",
+        "metadata": "Métadonnées",
+        "unknown-command": "Commande inconnue",
         "manifest": "Détails du manifeste",
         "schema-version": "Version du schéma",
         "media-type": "Type de média",
@@ -96,8 +113,19 @@
         "architecture": "Architecture",
         "os": "Système d'exploitation",
         "created": "Créé le",
+        "author": "Auteur",
         "load-config": "Charger les détails supplémentaires",
-        "loading-details": "Chargement des détails..."
+        "loading-details": "Chargement des détails...",
+        "hide-details": "Masquer les détails supplémentaires",
+        "show-details": "Afficher les détails supplémentaires",
+        "view-build-history": "Voir l'historique de construction",
+        "build-history": "Historique de construction",
+        "build-history-description": "Commandes Dockerfile qui ont créé cette image, incluant les couches de système de fichiers et les opérations de métadonnées.",
+        "steps": "{count} étape | {count} étapes",
+        "env-vars": "Variables d'environnement",
+        "entrypoint": "Point d'entrée",
+        "cmd": "CMD",
+        "exposed-ports": "Ports exposés"
       }
     }
   }

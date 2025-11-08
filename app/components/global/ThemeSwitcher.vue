@@ -4,7 +4,7 @@
       v-if="name"
       v-bind="$attrs"
       :icon="name"
-      label="Toggle color modes"
+      :label="$t('actions.toggle-theme')"
       variant="ghost"
       size="md"
       @click="toggleColorMode"

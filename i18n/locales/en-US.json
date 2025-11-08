@@ -24,23 +24,32 @@
   },
   "common": {
     "loading": "Loading...",
+    "loading-ellipsis": "...",
     "retry": "Retry",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
     "copy": "Copy",
+    "copied-to-clipboard": "{item} copied to clipboard!",
     "just-now": "Just now",
     "minutes-ago": "{count}m ago",
     "hours-ago": "{count}h ago",
-    "days-ago": "{count}d ago"
+    "days-ago": "{count}d ago",
+    "status": {
+      "error": "Error",
+      "incomplete": "Incomplete",
+      "complete": "Complete"
+    }
   },
   "actions": {
     "view-details": "View details",
     "delete-repository": "Delete repository",
     "delete-tag": "Delete tag",
     "copy-digest": "Copy digest",
+    "copy-all": "Copy All",
     "refresh": "Refresh",
-    "go-to-repositories": "Go to repositories"
+    "go-to-repositories": "Go to repositories",
+    "toggle-theme": "Toggle color modes"
   },
   "registry": {
     "repository": {
@@ -85,8 +94,16 @@
       },
       "details": {
         "layers": "Layers",
+        "layers-count": "{count} layer | {count} layers",
+        "layer": "Layer",
         "pull-command": "Pull Command",
         "full-digest": "Full Digest",
+        "dockerfile-command": "Dockerfile Command",
+        "type": "Type",
+        "filesystem-layer": "Filesystem Layer",
+        "filesystem": "Filesystem",
+        "metadata": "Metadata",
+        "unknown-command": "Unknown command",
         "manifest": "Manifest Details",
         "schema-version": "Schema Version",
         "media-type": "Media Type",
@@ -96,8 +113,19 @@
         "architecture": "Architecture",
         "os": "Operating System",
         "created": "Created",
+        "author": "Author",
         "load-config": "Load Additional Details",
-        "loading-details": "Loading details..."
+        "loading-details": "Loading details...",
+        "hide-details": "Hide Additional Details",
+        "show-details": "Show Additional Details",
+        "view-build-history": "View Build History",
+        "build-history": "Build History",
+        "build-history-description": "Dockerfile commands that created this image, including both filesystem layers and metadata operations.",
+        "steps": "{count} step | {count} steps",
+        "env-vars": "Environment Variables",
+        "entrypoint": "Entrypoint",
+        "cmd": "CMD",
+        "exposed-ports": "Exposed Ports"
       }
     }
   }

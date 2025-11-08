@@ -65,7 +65,11 @@
                     name="heroicons:rectangle-stack"
                     class="h-4 w-4 text-gray-500 dark:text-gray-400"
                   />
-                  {{ tag.manifestDetails.layers.length }} layers
+                  {{
+                    $t('registry.tag.details.layers-count', {
+                      count: tag.manifestDetails.layers.length,
+                    })
+                  }}
                 </span>
 
                 <!-- Quick copy digest (hover) -->
@@ -238,7 +242,7 @@
                           name="heroicons:chevron-right"
                           class="h-3 w-3 transition-transform group-data-[state=open]/layer:rotate-90"
                         />
-                        Layer {{ index + 1 }}
+                        {{ $t('registry.tag.details.layer') }} {{ index + 1 }}
                       </span>
                       <span class="font-semibold text-gray-900 dark:text-white">
                         {{ formatBytes(layer.size) }}
@@ -275,7 +279,7 @@
                       <!-- Dockerfile Command -->
                       <div v-if="getLayerHistoryEntry(index)">
                         <dt class="text-xs font-medium text-gray-600 dark:text-gray-400">
-                          Dockerfile Command
+                          {{ $t('registry.tag.details.dockerfile-command') }}
                         </dt>
                         <dd
                           class="mt-1 rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-900 dark:bg-gray-700 dark:text-white"
@@ -286,17 +290,17 @@
 
                       <!-- Layer Type Badge -->
                       <div class="flex items-center gap-2">
-                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400"
-                          >Type:</span
-                        >
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                          {{ $t('registry.tag.details.type') }}:
+                        </span>
                         <Badge
                           :class="getLayerTypeBadgeClass(getLayerType(getLayerHistoryEntry(index)))"
                           size="sm"
                         >
                           {{
                             getLayerType(getLayerHistoryEntry(index)) === 'filesystem'
-                              ? 'Filesystem Layer'
-                              : 'Metadata'
+                              ? $t('registry.tag.details.filesystem-layer')
+                              : $t('registry.tag.details.metadata')
                           }}
                         </Badge>
                       </div>
@@ -387,8 +391,12 @@
                 <span v-if="!tag.configDetails">
                   {{ $t('registry.tag.details.load-config') }}
                 </span>
-                <span v-else-if="isConfigExpanded"> Hide Additional Details </span>
-                <span v-else> Show Additional Details </span>
+                <span v-else-if="isConfigExpanded">
+                  {{ $t('registry.tag.details.hide-details') }}
+                </span>
+                <span v-else>
+                  {{ $t('registry.tag.details.show-details') }}
+                </span>
               </Button>
             </div>
 
@@ -437,7 +445,9 @@
                       </dd>
                     </div>
                     <div v-if="tag.configDetails.author" class="sm:col-span-2">
-                      <dt class="font-medium text-gray-600 dark:text-gray-400">Author</dt>
+                      <dt class="font-medium text-gray-600 dark:text-gray-400">
+                        {{ $t('registry.tag.details.author') }}
+                      </dt>
                       <dd class="text-gray-900 dark:text-white">{{ tag.configDetails.author }}</dd>
                     </div>
                   </dl>
@@ -446,12 +456,16 @@
                   <div v-if="tag.configDetails.history?.length" class="text-center">
                     <Button variant="secondary" size="sm" @click="openBuildHistoryModal">
                       <Icon name="heroicons:document-text" class="h-4 w-4" />
-                      View Build History
+                      {{ $t('registry.tag.details.view-build-history') }}
                       <Badge
                         size="sm"
                         class="ml-2 border border-gray-400 bg-transparent text-gray-700 dark:border-gray-500 dark:text-gray-300"
                       >
-                        {{ tag.configDetails.history.length }} steps
+                        {{
+                          $t('registry.tag.details.steps', {
+                            count: tag.configDetails.history.length,
+                          })
+                        }}
                       </Badge>
                     </Button>
                   </div>
@@ -459,7 +473,7 @@
                   <!-- Environment Variables -->
                   <div v-if="tag.configDetails.config?.Env?.length" class="space-y-1">
                     <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Environment Variables
+                      {{ $t('registry.tag.details.env-vars') }}
                     </dt>
                     <dd class="space-y-1">
                       <div
@@ -474,7 +488,9 @@
 
                   <!-- Entrypoint -->
                   <div v-if="tag.configDetails.config?.Entrypoint?.length" class="space-y-1">
-                    <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Entrypoint</dt>
+                    <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('registry.tag.details.entrypoint') }}
+                    </dt>
                     <dd
                       class="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-900 dark:bg-gray-700 dark:text-white"
                     >
@@ -484,7 +500,9 @@
 
                   <!-- CMD -->
                   <div v-if="tag.configDetails.config?.Cmd?.length" class="space-y-1">
-                    <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">CMD</dt>
+                    <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('registry.tag.details.cmd') }}
+                    </dt>
                     <dd
                       class="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-900 dark:bg-gray-700 dark:text-white"
                     >
@@ -495,7 +513,7 @@
                   <!-- Exposed Ports -->
                   <div v-if="tag.configDetails.config?.ExposedPorts" class="space-y-1">
                     <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Exposed Ports
+                      {{ $t('registry.tag.details.exposed-ports') }}
                     </dt>
                     <dd class="flex flex-wrap gap-1">
                       <Badge
@@ -526,17 +544,18 @@
       >
         <!-- Header -->
         <DialogTitle class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-          Build History
+          {{ $t('registry.tag.details.build-history') }}
           <Badge
             size="sm"
             class="ml-2 border border-gray-400 bg-transparent text-gray-700 dark:border-gray-500 dark:text-gray-300"
           >
-            {{ tag.configDetails?.history?.length || 0 }} steps
+            {{
+              $t('registry.tag.details.steps', { count: tag.configDetails?.history?.length || 0 })
+            }}
           </Badge>
         </DialogTitle>
         <DialogDescription class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-          Dockerfile commands that created this image, including both filesystem layers and metadata
-          operations.
+          {{ $t('registry.tag.details.build-history-description') }}
         </DialogDescription>
 
         <!-- Scrollable Build History Content -->
@@ -559,7 +578,11 @@
                   :class="getLayerTypeBadgeClass(step.empty_layer ? 'metadata' : 'filesystem')"
                   size="sm"
                 >
-                  {{ step.empty_layer ? 'Metadata' : 'Filesystem' }}
+                  {{
+                    step.empty_layer
+                      ? $t('registry.tag.details.metadata')
+                      : $t('registry.tag.details.filesystem')
+                  }}
                 </Badge>
                 <span class="font-mono text-xs text-gray-900 dark:text-white">
                   {{ parseDockerCommand(step.created_by || '') }}
@@ -573,12 +596,12 @@
         <div class="mt-4 flex justify-end gap-2">
           <Button variant="ghost" size="sm" @click="copyBuildHistory">
             <Icon name="heroicons:clipboard-document" class="h-4 w-4" />
-            Copy All
+            {{ $t('actions.copy-all') }}
           </Button>
           <DialogClose as-child>
             <Button variant="secondary" size="sm">
               <Icon name="heroicons:x-mark" class="h-4 w-4" />
-              Close
+              {{ $t('common.close') }}
             </Button>
           </DialogClose>
         </div>
@@ -638,7 +661,8 @@ const getLayerPercentage = (layerSize: number): number => {
 const copyToClipboard = async (text: string, label: string) => {
   try {
     await navigator.clipboard.writeText(text)
-    showSuccess(`${label} copied to clipboard!`)
+    const { $t } = useNuxtApp()
+    showSuccess($t('common.copied-to-clipboard', { item: label }))
   } catch (error) {
     logger.error('Failed to copy to clipboard:', error)
   }
@@ -696,13 +720,14 @@ const getStatusOutlinedClass = (tag: Tag): string => {
 }
 
 const getStatusLabel = (tag: Tag): string => {
+  const { $t } = useNuxtApp()
   if (tag.hasError) {
-    return 'Error'
+    return $t('common.status.error')
   }
   if (!tag.manifestDetails || !tag.digest || tag.size === 0) {
-    return 'Incomplete'
+    return $t('common.status.incomplete')
   }
-  return 'Complete'
+  return $t('common.status.complete')
 }
 
 const layerMonochromeShades = [
@@ -717,8 +742,9 @@ const getLayerMonochromeClass = (index: number): string => {
 }
 
 const parseDockerCommand = (created_by: string): string => {
+  const { $t } = useNuxtApp()
   if (!created_by) {
-    return 'Unknown command'
+    return $t('registry.tag.details.unknown-command')
   }
   const command = created_by
     .replace(/^\/bin\/sh -c #\(nop\) /, '')
