@@ -40,22 +40,7 @@ export const envSchema = z.object({
     .optional()
     .transform(val => (val ? Number(val) : undefined)),
 
-  HOST: z
-    .string()
-    .default('127.0.0.1')
-    .refine(
-      val => {
-        // In production, enforce localhost binding for security
-        if (process.env.NODE_ENV === 'production' && val !== '127.0.0.1') {
-          return false
-        }
-        return true
-      },
-      {
-        message:
-          'HOST must be 127.0.0.1 in production for security (only expose via reverse proxy)',
-      }
-    ),
+  HOST: z.string().default('127.0.0.1'),
 
   PORT: z
     .string()
