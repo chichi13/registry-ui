@@ -272,6 +272,16 @@ export const useRegistryStore = defineStore('registry', {
 
         this.repositoriesWithTags.set(repositoryName, tagsWithDetails)
 
+        // Preload all config details in background
+        const storedTags = this.repositoriesWithTags.get(repositoryName) || []
+        storedTags.forEach(tag => {
+          if (!tag.hasError && tag.manifestDetails?.config.digest) {
+            this.fetchConfigBlob(repositoryName, tag).catch(error => {
+              logger.warn(`Failed to preload config for ${repositoryName}:${tag.name}:`, error)
+            })
+          }
+        })
+
         const repo = this.repositories.find(r => r.name === repositoryName)
         if (repo) {
           repo.tagCount = tagsWithDetails.length
@@ -349,6 +359,11 @@ export const useRegistryStore = defineStore('registry', {
         logger.warn(
           `Cannot fetch config blob: missing config digest for ${repositoryName}:${tag.name}`
         )
+        return
+      }
+
+      // Skip if already loaded or currently loading (avoid duplicate API calls)
+      if (tag.configDetails || tag.isLoadingConfig) {
         return
       }
 
