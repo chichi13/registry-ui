@@ -339,8 +339,6 @@ This application uses an intelligent **three-tier approach** to delete Docker ta
 2. **Dummy Manifest Workaround** (Current solution) - Proven approach used by professional tools like `regctl`
 3. **Digest Deletion** (Last resort) - Traditional deletion with warning about affecting all tags
 
-See the [full technical documentation](CLAUDE.md) for detailed implementation.
-
 </details>
 
 ---

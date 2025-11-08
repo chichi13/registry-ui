@@ -316,7 +316,7 @@ Help translate the UI:
 
 ### Getting Help
 
-- Read the [README.md](README.md) and [CLAUDE.md](CLAUDE.md)
+- Read the [README.md](README.md)
 - Check existing issues and discussions
 - Ask questions in GitHub Discussions
 - Be patient and respectful
