@@ -639,6 +639,7 @@ const { formatBytes, formatDate } = useDockerRegistry()
 const { success: showSuccess } = useToast()
 const registryStore = useRegistryStore()
 const config = useRuntimeConfig()
+const { t } = useI18n()
 
 const isOpen = ref(false)
 const isConfigExpanded = ref(false)
@@ -659,8 +660,7 @@ const getLayerPercentage = (layerSize: number): number => {
 const copyToClipboard = async (text: string, label: string) => {
   try {
     await navigator.clipboard.writeText(text)
-    const { $t } = useNuxtApp()
-    showSuccess($t('common.copied-to-clipboard', { item: label }))
+    showSuccess(t('common.copied-to-clipboard', { item: label }))
   } catch (error) {
     logger.error('Failed to copy to clipboard:', error)
   }
@@ -718,14 +718,13 @@ const getStatusOutlinedClass = (tag: Tag): string => {
 }
 
 const getStatusLabel = (tag: Tag): string => {
-  const { $t } = useNuxtApp()
   if (tag.hasError) {
-    return $t('common.status.error')
+    return t('common.status.error')
   }
   if (!tag.manifestDetails || !tag.digest || tag.size === 0) {
-    return $t('common.status.incomplete')
+    return t('common.status.incomplete')
   }
-  return $t('common.status.complete')
+  return t('common.status.complete')
 }
 
 const layerMonochromeShades = [
@@ -740,9 +739,8 @@ const getLayerMonochromeClass = (index: number): string => {
 }
 
 const parseDockerCommand = (created_by: string): string => {
-  const { $t } = useNuxtApp()
   if (!created_by) {
-    return $t('registry.tag.details.unknown-command')
+    return t('registry.tag.details.unknown-command')
   }
   const command = created_by
     .replace(/^\/bin\/sh -c #\(nop\) /, '')
