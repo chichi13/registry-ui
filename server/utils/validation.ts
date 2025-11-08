@@ -9,6 +9,7 @@
  */
 
 import { z } from 'zod'
+import { envLogger } from './logger'
 
 // ============================================
 // Environment Variables Validation
@@ -74,6 +75,8 @@ export const envSchema = z.object({
 
   REGISTRY_PASSWORD: z.string().default(''),
 
+  REGISTRY_AUTH_METHOD: z.enum(['basic', 'bearer', 'none']).optional(),
+
   REGISTRY_TOKEN_CACHE_TTL: z
     .string()
     .regex(/^\d+$/, 'REGISTRY_TOKEN_CACHE_TTL must be a number')
@@ -108,22 +111,27 @@ export const envSchema = z.object({
     .transform(val => val === 'true'),
 })
 
-export type Env = z.infer<typeof envSchema>
+export type Env = Omit<z.infer<typeof envSchema>, 'REGISTRY_AUTH_METHOD'> & {
+  REGISTRY_AUTH_METHOD: 'basic' | 'bearer' | 'none'
+}
 
-/**
- * Validate and parse environment variables
- * @throws {ZodError} if validation fails
- */
 export function validateEnv(): Env {
   const result = envSchema.safeParse(process.env)
 
   if (!result.success) {
-    console.error('❌ Environment validation failed:')
-    console.error(result.error.format())
+    envLogger.error('Environment validation failed:')
+    envLogger.error(result.error.format())
     throw new Error('Invalid environment configuration')
   }
 
-  return result.data
+  const data = result.data
+
+  if (!data.REGISTRY_AUTH_METHOD) {
+    const hasCredentials = Boolean(data.REGISTRY_USERNAME && data.REGISTRY_PASSWORD)
+    data.REGISTRY_AUTH_METHOD = hasCredentials ? 'basic' : 'none'
+  }
+
+  return data as Env
 }
 
 // ============================================

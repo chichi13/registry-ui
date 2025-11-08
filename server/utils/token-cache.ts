@@ -1,5 +1,11 @@
+/**
+ * Supported authentication methods for Docker Registry
+ */
+export type AuthMethod = 'basic' | 'bearer' | 'none'
+
 interface CachedToken {
   token: string
+  authMethod: AuthMethod // Authentication method used
   expiresAt: number // Unix timestamp in milliseconds
   issuedAt: number // Unix timestamp in milliseconds
 }
@@ -28,7 +34,7 @@ export class TokenCache {
     this.refreshBuffer = (options.refreshBuffer || 30) * 1000 // Convert to milliseconds
   }
 
-  get(key: string): string | null {
+  get(key: string): { token: string; authMethod: AuthMethod } | null {
     const cached = this.cache.get(key)
 
     if (!cached) {
@@ -43,15 +49,16 @@ export class TokenCache {
       return null
     }
 
-    return cached.token
+    return { token: cached.token, authMethod: cached.authMethod }
   }
 
-  set(key: string, token: string): void {
+  set(key: string, token: string, authMethod: AuthMethod): void {
     const now = Date.now()
     const expiresAt = now + this.ttl
 
     this.cache.set(key, {
       token,
+      authMethod,
       expiresAt,
       issuedAt: now,
     })

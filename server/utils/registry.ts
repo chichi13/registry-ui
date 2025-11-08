@@ -1,9 +1,18 @@
 /**
  * Docker Registry V2 API Client
  *
- * Bearer token authentication, caching, retry logic, and error handling.
+ * Supports both Basic Auth (htpasswd) and Bearer Token (OAuth2) authentication.
+ * Authentication method is configured via REGISTRY_AUTH_METHOD environment variable.
  * Reference: https://docs.docker.com/registry/spec/api/
  */
+
+/**
+ * Authentication result with token and method
+ */
+interface AuthResult {
+  token: string
+  method: AuthMethod
+}
 
 /**
  * Bearer token response from registry
@@ -78,6 +87,14 @@ export class RegistryClient {
     })
   }
 
+  private async parseErrorResponse(response: Response): Promise<unknown> {
+    try {
+      return await response.json()
+    } catch {
+      return null
+    }
+  }
+
   async ping(): Promise<boolean> {
     try {
       const response = await this.fetchWithTimeout(`${this.config.registryUrl}/v2/`, {
@@ -91,101 +108,45 @@ export class RegistryClient {
     }
   }
 
-  /**
-   * Authenticate and get bearer token
-   */
-  private async authenticate(scope?: string): Promise<string> {
-    // Check cache first
+  private async authenticate(scope?: string): Promise<AuthResult> {
     const cacheKey = createCacheKey(this.config.registryUrl, scope)
 
-    // Return cached token if valid and not near expiration
     if (!this.tokenCache.shouldRefresh(cacheKey)) {
-      const cachedToken = this.tokenCache.get(cacheKey)
-      if (cachedToken) {
-        return cachedToken
+      const cached = this.tokenCache.get(cacheKey)
+      if (cached) {
+        return { token: cached.token, method: cached.authMethod }
       }
     }
 
-    // No authentication required
+    const env = validateEnv()
+    const method = env.REGISTRY_AUTH_METHOD
+
     if (!this.config.username || !this.config.password) {
-      return ''
+      return { token: '', method: 'none' }
     }
 
     try {
-      // First request to get authentication challenge
-      const initialResponse = await this.fetchWithTimeout(`${this.config.registryUrl}/v2/`, {
-        method: 'GET',
-      })
-
-      // No authentication required (200 OK)
-      if (initialResponse.ok) {
-        return ''
+      if (method === 'none') {
+        return { token: '', method: 'none' }
       }
 
-      // Parse WWW-Authenticate header
-      const authHeader = initialResponse.headers.get('www-authenticate')
-      if (!authHeader || !authHeader.includes('Bearer')) {
-        throw new AuthError(
-          'Registry does not support bearer token authentication',
-          401,
-          ErrorCodes.AUTH_FAILED
-        )
+      if (method === 'basic') {
+        const basicToken = btoa(`${this.config.username}:${this.config.password}`)
+        this.tokenCache.set(cacheKey, basicToken, 'basic')
+        return { token: basicToken, method: 'basic' }
       }
 
-      // Extract realm and service from auth header
-      const realmMatch = authHeader.match(/realm="([^"]+)"/)
-      const serviceMatch = authHeader.match(/service="([^"]+)"/)
-
-      if (!realmMatch) {
-        throw new AuthError(
-          'Invalid authentication challenge from registry',
-          401,
-          ErrorCodes.AUTH_FAILED,
-          {
-            authHeader,
-          }
-        )
+      if (method === 'bearer') {
+        const bearerToken = await this.fetchBearerToken(scope)
+        this.tokenCache.set(cacheKey, bearerToken, 'bearer')
+        return { token: bearerToken, method: 'bearer' }
       }
 
-      const realm = realmMatch[1]
-      const service = serviceMatch?.[1]
-
-      // Build token request URL
-      const tokenUrl = new URL(realm)
-      if (service) {
-        tokenUrl.searchParams.set('service', service)
-      }
-      if (scope) {
-        tokenUrl.searchParams.set('scope', scope)
-      }
-
-      // Request bearer token
-      const tokenResponse = await this.fetchWithTimeout(tokenUrl.toString(), {
-        method: 'GET',
-        headers: {
-          Authorization: `Basic ${btoa(`${this.config.username}:${this.config.password}`)}`,
-        },
-      })
-
-      if (!tokenResponse.ok) {
-        throw new AuthError(
-          'Failed to obtain bearer token from registry',
-          tokenResponse.status,
-          ErrorCodes.AUTH_FAILED
-        )
-      }
-
-      const tokenData: TokenResponse = await tokenResponse.json()
-      const token = tokenData.token || tokenData.access_token
-
-      if (!token) {
-        throw new AuthError('Registry returned empty token', 401, ErrorCodes.TOKEN_INVALID)
-      }
-
-      // Cache the token
-      this.tokenCache.set(cacheKey, token)
-
-      return token
+      throw new AuthError(
+        `Unsupported authentication method: ${method}`,
+        401,
+        ErrorCodes.AUTH_FAILED
+      )
     } catch (error) {
       if (error instanceof AuthError) {
         logError(error, 'RegistryClient.authenticate')
@@ -205,22 +166,102 @@ export class RegistryClient {
     }
   }
 
+  private async fetchBearerToken(scope?: string): Promise<string> {
+    const initialResponse = await this.fetchWithTimeout(`${this.config.registryUrl}/v2/`, {
+      method: 'GET',
+    })
+
+    const authHeader = initialResponse.headers.get('www-authenticate')
+    if (!authHeader || !authHeader.toLowerCase().includes('bearer')) {
+      throw new AuthError(
+        'Registry does not support bearer token authentication',
+        401,
+        ErrorCodes.AUTH_FAILED,
+        { authHeader }
+      )
+    }
+
+    const realmMatch = authHeader.match(/realm="([^"]+)"/)
+    const serviceMatch = authHeader.match(/service="([^"]+)"/)
+
+    if (!realmMatch) {
+      throw new AuthError(
+        'Invalid bearer token challenge from registry',
+        401,
+        ErrorCodes.AUTH_FAILED,
+        { authHeader }
+      )
+    }
+
+    const realm = realmMatch[1]
+    const service = serviceMatch?.[1]
+
+    const tokenUrl = new URL(realm)
+    if (service) {
+      tokenUrl.searchParams.set('service', service)
+    }
+    if (scope) {
+      tokenUrl.searchParams.set('scope', scope)
+    }
+
+    const tokenResponse = await this.fetchWithTimeout(tokenUrl.toString(), {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${btoa(`${this.config.username}:${this.config.password}`)}`,
+      },
+    })
+
+    if (!tokenResponse.ok) {
+      throw new AuthError(
+        'Failed to obtain bearer token from OAuth2 server',
+        tokenResponse.status,
+        ErrorCodes.AUTH_FAILED
+      )
+    }
+
+    const tokenData: TokenResponse = await tokenResponse.json()
+    const token = tokenData.token || tokenData.access_token
+
+    if (!token) {
+      throw new AuthError('OAuth2 server returned empty token', 401, ErrorCodes.TOKEN_INVALID)
+    }
+
+    return token
+  }
+
+  private createAuthHeader(token: string, method: AuthMethod): Record<string, string> {
+    if (method === 'none' || !token) {
+      return {}
+    }
+
+    if (method === 'basic') {
+      return { Authorization: `Basic ${token}` }
+    }
+
+    if (method === 'bearer') {
+      return { Authorization: `Bearer ${token}` }
+    }
+
+    return {}
+  }
+
   /**
    * List all repositories in the registry
    */
   async listRepositories(): Promise<string[]> {
-    const token = await this.authenticate('registry:catalog:*')
+    const auth = await this.authenticate('registry:catalog:*')
 
     try {
       const response = await this.fetchWithRetry(`${this.config.registryUrl}/v2/_catalog`, {
         method: 'GET',
         headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
+          ...this.createAuthHeader(auth.token, auth.method),
         },
       })
 
       if (!response.ok) {
-        throw mapRegistryError(response.status, 'Failed to list repositories')
+        const errorBody = await this.parseErrorResponse(response)
+        throw mapRegistryError(response.status, 'Failed to list repositories', errorBody)
       }
 
       const data: RepositoriesResponse = await response.json()
@@ -248,7 +289,7 @@ export class RegistryClient {
    */
   async listTags(repositoryName: string): Promise<string[]> {
     const scope = `repository:${repositoryName}:pull`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const response = await this.fetchWithRetry(
@@ -256,16 +297,18 @@ export class RegistryClient {
         {
           method: 'GET',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
+            ...this.createAuthHeader(auth.token, auth.method),
           },
         }
       )
 
       if (!response.ok) {
+        const errorBody = await this.parseErrorResponse(response)
         throw mapRegistryError(
           response.status,
           `Failed to list tags for repository '${repositoryName}'`,
           {
+            ...errorBody,
             repository: repositoryName,
           }
         )
@@ -301,7 +344,7 @@ export class RegistryClient {
     reference: string
   ): Promise<{ manifest: ManifestResponse; digest: string }> {
     const scope = `repository:${repositoryName}:pull`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const response = await this.fetchWithRetry(
@@ -309,25 +352,26 @@ export class RegistryClient {
         {
           method: 'GET',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
-            // Critical: Request manifest v2 format to get digest in response headers
-            Accept: 'application/vnd.docker.distribution.manifest.v2+json',
+            ...this.createAuthHeader(auth.token, auth.method),
+            Accept:
+              'application/vnd.docker.distribution.manifest.v2+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json',
           },
         }
       )
 
       if (!response.ok) {
+        const errorBody = await this.parseErrorResponse(response)
         throw mapRegistryError(
           response.status,
           `Failed to get manifest for '${repositoryName}:${reference}'`,
           {
+            ...errorBody,
             repository: repositoryName,
             reference,
           }
         )
       }
 
-      // Extract digest from response headers
       const digest = response.headers.get('docker-content-digest')
       if (!digest) {
         throw new RegistryError(
@@ -375,7 +419,7 @@ export class RegistryClient {
    */
   async deleteManifest(repositoryName: string, reference: string): Promise<Response> {
     const scope = `repository:${repositoryName}:pull,push,delete`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const response = await this.fetchWithRetry(
@@ -383,7 +427,7 @@ export class RegistryClient {
         {
           method: 'DELETE',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
+            ...this.createAuthHeader(auth.token, auth.method),
           },
         }
       )
@@ -419,7 +463,7 @@ export class RegistryClient {
    */
   async getBlob<T = unknown>(repositoryName: string, digest: string): Promise<T> {
     const scope = `repository:${repositoryName}:pull`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const response = await this.fetchWithRetry(
@@ -427,17 +471,19 @@ export class RegistryClient {
         {
           method: 'GET',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
+            ...this.createAuthHeader(auth.token, auth.method),
             Accept: 'application/vnd.docker.container.image.v1+json',
           },
         }
       )
 
       if (!response.ok) {
+        const errorBody = await this.parseErrorResponse(response)
         throw mapRegistryError(
           response.status,
           `Failed to get blob '${digest}' from repository '${repositoryName}'`,
           {
+            ...errorBody,
             repository: repositoryName,
             digest,
           }
@@ -471,7 +517,7 @@ export class RegistryClient {
    */
   async headBlob(repositoryName: string, digest: string): Promise<void> {
     const scope = `repository:${repositoryName}:pull`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const response = await this.fetchWithRetry(
@@ -479,16 +525,18 @@ export class RegistryClient {
         {
           method: 'HEAD',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
+            ...this.createAuthHeader(auth.token, auth.method),
           },
         }
       )
 
       if (!response.ok) {
+        const errorBody = await this.parseErrorResponse(response)
         throw mapRegistryError(
           response.status,
           `Blob '${digest}' not found in repository '${repositoryName}'`,
           {
+            ...errorBody,
             repository: repositoryName,
             digest,
           }
@@ -520,7 +568,7 @@ export class RegistryClient {
    */
   async initiateUpload(repositoryName: string): Promise<string> {
     const scope = `repository:${repositoryName}:pull,push`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const response = await this.fetchWithRetry(
@@ -528,17 +576,19 @@ export class RegistryClient {
         {
           method: 'POST',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
+            ...this.createAuthHeader(auth.token, auth.method),
             'Content-Length': '0',
           },
         }
       )
 
       if (!response.ok) {
+        const errorBody = await this.parseErrorResponse(response)
         throw mapRegistryError(
           response.status,
           `Failed to initiate blob upload for repository '${repositoryName}'`,
           {
+            ...errorBody,
             repository: repositoryName,
           }
         )
@@ -554,7 +604,6 @@ export class RegistryClient {
         )
       }
 
-      // Make upload URL absolute if it's relative
       if (uploadUrl.startsWith('/')) {
         return `${this.config.registryUrl}${uploadUrl}`
       }
@@ -635,7 +684,7 @@ export class RegistryClient {
     manifest: unknown
   ): Promise<{ digest: string }> {
     const scope = `repository:${repositoryName}:pull,push`
-    const token = await this.authenticate(scope)
+    const auth = await this.authenticate(scope)
 
     try {
       const manifestJson = JSON.stringify(manifest)
@@ -645,7 +694,7 @@ export class RegistryClient {
         {
           method: 'PUT',
           headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
+            ...this.createAuthHeader(auth.token, auth.method),
             'Content-Type': 'application/vnd.oci.image.manifest.v1+json',
             'Content-Length': manifestJson.length.toString(),
           },
@@ -654,10 +703,12 @@ export class RegistryClient {
       )
 
       if (!response.ok) {
+        const errorBody = await this.parseErrorResponse(response)
         throw mapRegistryError(
           response.status,
           `Failed to PUT manifest to '${tag}' in repository '${repositoryName}'`,
           {
+            ...errorBody,
             repository: repositoryName,
             tag,
           }
