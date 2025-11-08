@@ -28,7 +28,6 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
-    '@dargmuesli/nuxt-cookie-control',
   ],
   nitro: {
     compressPublicAssets: true,

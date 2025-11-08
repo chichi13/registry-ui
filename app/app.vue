@@ -36,7 +36,6 @@ useHead({
     />
     <NuxtLayout>
       <div>
-        <CookieBanner />
         <NuxtPage />
       </div>
     </NuxtLayout>
