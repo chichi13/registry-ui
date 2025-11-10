@@ -13,7 +13,7 @@ Self-hosted • Secure • Mobile-First • No Database Required
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38B2AC)](https://tailwindcss.com/)
 
-[Quick Start](#quick-start) • [Features](#features) • [Documentation](#documentation) • [Contributing](#contributing) • [Discussions](https://github.com/chichi13/registry-ui/discussions)
+[Prerequisites](#prerequisites) • [Installation Production](#installation-en-production) • [Features](#features) • [Development](#development) • [Discussions](https://github.com/chichi13/registry-ui/discussions)
 
 </div>
 
@@ -22,80 +22,6 @@ Self-hosted • Secure • Mobile-First • No Database Required
 ## Why Docker Registry UI?
 
 Managing Docker images in a self-hosted registry shouldn't require complex tools or compromising on security. **Docker Registry UI** provides a clean, modern interface that works seamlessly with your existing Docker Registry V2 API infrastructure.
-
-**Perfect for:**
-
-- **Teams** managing private Docker images
-- **Security-conscious** organizations requiring self-hosted solutions
-- **DevOps teams** needing a lightweight registry management tool
-- **Developers** who want a simple UI without vendor lock-in
-
-**Key Advantages:**
-
-- **100% Open Source** - MIT licensed, fully transparent
-- **No Database** - Stateless architecture, all data from Registry API
-- **Bring Your Own Auth** - Integrates with your reverse proxy authentication
-- **Privacy First** - Self-hosted, your data stays on your infrastructure
-- **Mobile Ready** - Responsive design optimized for all devices
-
----
-
-## Features
-
-### Security & Architecture
-
-- **External Authentication** - Integrates with reverse proxy (Nginx, Caddy, Traefik) for Basic Auth/OAuth
-- **Security First** - Must run behind authenticated reverse proxy, never exposed directly
-- **Stateless Design** - No database required, all state managed through Registry API
-- **Type-Safe** - Full TypeScript coverage with strict mode and Zod validation
-
-### User Experience
-
-- **Mobile-First Design** - Responsive UI optimized for all devices (mobile to desktop)
-- **Dark Mode** - Automatic system preference detection with manual toggle
-- **Internationalization** - Multi-language support (English, French)
-- **Accessibility** - WCAG 2.1 AA compliant components with keyboard navigation
-- **Performance** - Server-side rendering, optimized bundle (<500KB initial)
-
-### Docker Registry Integration
-
-- **Full V2 API Support** - Complete compatibility with Docker Registry V2 API
-- **Smart Tag Deletion** - Intelligent three-tier deletion strategy (OCI API → Dummy Manifest → Digest fallback)
-- **Repository Management** - Browse, search, and manage repositories and tags
-- **Image Metadata** - View architecture, OS, size, and creation dates
-
-### Developer Experience
-
-- **Built with Nuxt 4** - Modern Vue 3 framework with Composition API
-- **Quality Assured** - ESLint, Prettier, Git hooks, and comprehensive validation
-- **Conventional Commits** - Standardized commit message format
-- **Documentation** - Comprehensive guides for deployment and development
-
----
-
-## Quick Start
-
-Get up and running in minutes:
-
-```bash
-# Clone the repository
-git clone https://github.com/chichi13/registry-ui.git
-cd registry-ui
-
-# Install dependencies
-bun install
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your Docker Registry URL and credentials
-
-# Start development server
-bun run dev
-```
-
-The application will be available at `http://localhost:3000`.
-
-**Production Deployment:** This application MUST be deployed behind a reverse proxy with authentication. See [Deployment Guide](#deployment-with-reverse-proxy) for details.
 
 ---
 
@@ -111,7 +37,39 @@ The application will be available at `http://localhost:3000`.
 
 ---
 
-## Documentation
+## Prerequisites
+
+You need a **Docker Registry V2 API** running. Here's how to start one locally for testing:
+
+```bash
+# Generate htpasswd file (username: admin, password: admin)
+docker run --rm httpd:2.4-alpine htpasswd -nbB admin admin > registry.password
+
+# Run Docker Registry 3 with authentication and delete enabled
+docker run -d -p 5000:5000 \
+  -e REGISTRY_STORAGE_DELETE_ENABLED=true \
+  -e REGISTRY_AUTH=htpasswd \
+  -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/registry.password \
+  -v $(pwd)/registry.password:/auth/registry.password \
+  -v registry-data:/var/lib/registry \
+  --name registry \
+  registry:3
+```
+
+Your registry will be available at `http://localhost:5000` with credentials `admin:admin`.
+
+---
+
+## Installation en Production
+
+**CRITICAL:** This application MUST be deployed behind a reverse proxy with authentication. Never expose it directly to the internet.
+
+**Architecture:**
+
+```
+Internet → Reverse Proxy (Auth) → Registry UI (localhost:3000) → Docker Registry
+```
 
 ### Configuration
 
@@ -119,18 +77,17 @@ The application will be available at `http://localhost:3000`.
 
 Create a `.env` file in the root directory:
 
-| Variable                   | Required | Default          | Description                                            |
-| -------------------------- | -------- | ---------------- | ------------------------------------------------------ |
-| `NODE_ENV`                 | Yes      | `development`    | Environment mode (`development` or `production`)       |
-| `HOST`                     | Yes      | `127.0.0.1`      | Host to bind                                           |
-| `PORT`                     | Yes      | `3000`           | Port for the application server                        |
-| `REGISTRY_URL`             | Yes      | -                | URL of your Docker Registry V2 API                     |
-| `REGISTRY_USERNAME`        | No       | -                | Username for registry authentication                   |
-| `REGISTRY_PASSWORD`        | No       | -                | Password for registry authentication                   |
-| `REGISTRY_VERIFY_SSL`      | Yes      | `true`           | Verify SSL certificates (MUST be `true` in production) |
-| `REGISTRY_TOKEN_CACHE_TTL` | Yes      | `300`            | Token cache duration in seconds (60-3600)              |
-| `ENABLE_USER_LOGGING`      | No       | `false`          | Enable user logging from `X-Forwarded-User` header     |
-| `NUXT_PUBLIC_REGISTRY_URL` | No       | `localhost:5000` | Public URL users should use in "docker pull" commands  |
+| Variable                   | Required | Default          | Description                                           |
+| -------------------------- | -------- | ---------------- | ----------------------------------------------------- |
+| `NODE_ENV`                 | Yes      | `development`    | Environment mode (`development` or `production`)      |
+| `HOST`                     | Yes      | `127.0.0.1`      | Host to bind                                          |
+| `PORT`                     | Yes      | `3000`           | Port for the application server                       |
+| `REGISTRY_URL`             | Yes      | -                | URL of your Docker Registry V2 API                    |
+| `REGISTRY_USERNAME`        | No       | -                | Username for registry authentication                  |
+| `REGISTRY_PASSWORD`        | No       | -                | Password for registry authentication                  |
+| `REGISTRY_TOKEN_CACHE_TTL` | Yes      | `300`            | Token cache duration in seconds (60-3600)             |
+| `ENABLE_USER_LOGGING`      | No       | `false`          | Enable user logging from `X-Forwarded-User` header    |
+| `NUXT_PUBLIC_REGISTRY_URL` | No       | `localhost:5000` | Public URL users should use in "docker pull" commands |
 
 **Example Configuration:**
 
@@ -143,22 +100,13 @@ REGISTRY_URL=https://registry.example.com
 NUXT_PUBLIC_REGISTRY_URL=mypublicregistry.com
 REGISTRY_USERNAME=admin
 REGISTRY_PASSWORD=your-secure-password
-REGISTRY_VERIFY_SSL=true
 REGISTRY_TOKEN_CACHE_TTL=300
 ENABLE_USER_LOGGING=true
 ```
 
 ---
 
-### Deployment with Reverse Proxy
-
-**CRITICAL:** This application MUST be deployed behind a reverse proxy with authentication. Never expose it directly to the internet.
-
-**Architecture:**
-
-```
-Internet → Reverse Proxy (Auth) → Registry UI (localhost:3000) → Docker Registry
-```
+### Reverse Proxy Configuration
 
 <details>
 <summary><b>Nginx Configuration</b></summary>
@@ -281,39 +229,33 @@ docker run -d \
 
 ---
 
-### Development
+## Features
 
-**Commands:**
+### Security & Architecture
 
-```bash
-# Development
-bun run dev              # Start development server
-bun run dev-https        # Start development server with HTTPS
+- **External Authentication** - Integrates with reverse proxy (Nginx, Caddy, Traefik) for Basic Auth/OAuth
+- **Security First** - Must run behind authenticated reverse proxy, never exposed directly
+- **Stateless Design** - No database required, all state managed through Registry API
+- **Type-Safe** - Full TypeScript coverage with strict mode and Zod validation
 
-# Production
-bun run build            # Build for production
-bun run start            # Start production server
-bun run start:local      # Start production server with local .env
-bun run preview:static   # Preview production build (static)
+### User Experience
 
-# Code Quality
-bun run lint             # Lint code
-bun run lint:fix         # Lint fix
-bun run prettier:check   # Check code formatting
-bun run prettier:fix     # Fix code formatting
-```
+- **Mobile-First Design** - Responsive UI optimized for all devices (mobile to desktop)
+- **Dark Mode** - Automatic system preference detection with manual toggle
+- **Internationalization** - Multi-language support (English, French)
+- **Accessibility** - WCAG 2.1 AA compliant components with keyboard navigation
+- **Performance** - Server-side rendering, optimized bundle (<500KB initial)
 
-**Code Quality Standards:**
+### Docker Registry Integration
 
-- **ESLint** - Security rules, import order, TypeScript best practices
-- **Prettier** - Consistent code formatting (single quotes, no semicolons)
-- **TypeScript** - Strict mode with additional checks
-- **Git Hooks** - Pre-commit linting, formatting, and type-checking
-- **Conventional Commits** - Standardized commit message format
+- **Full V2 API Support** - Complete compatibility with Docker Registry V2 API
+- **Smart Tag Deletion** - Intelligent three-tier deletion strategy (OCI API → Dummy Manifest → Digest fallback)
+- **Repository Management** - Browse, search, and manage repositories and tags
+- **Image Metadata** - View architecture, OS, size, and creation dates
 
 ---
 
-### Troubleshooting
+## Troubleshooting
 
 <details>
 <summary><b>Authentication failures</b></summary>
@@ -343,50 +285,78 @@ This application uses an intelligent **three-tier approach** to delete Docker ta
 
 ---
 
-## Contributing
+## Development
 
-We welcome contributions from the community! Whether it's bug reports, feature requests, documentation improvements, or code contributions, every contribution makes a difference.
+Get started with local development:
+
+```bash
+# Clone the repository
+git clone https://github.com/chichi13/registry-ui.git
+cd registry-ui
+
+# Install dependencies
+bun install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your Docker Registry URL (http://localhost:5000 for local testing)
+
+# Start development server
+bun run dev
+```
+
+The application will be available at `http://localhost:3000`.
+
+### Commands
+
+```bash
+# Development
+bun run dev              # Start development server
+
+# Build
+bun run build            # Build for production
+bun run start            # Start production server
+
+# Code Quality
+bun run lint             # Lint code
+bun run prettier:fix     # Fix code formatting
+```
+
+### Code Quality
+
+- **ESLint** - Security rules, import order, TypeScript best practices
+- **Prettier** - Consistent code formatting (single quotes, no semicolons)
+- **TypeScript** - Strict mode with additional checks
+- **Git Hooks** - Pre-commit linting, formatting, and type-checking
+- **Conventional Commits** - Standardized commit message format
+
+### Contributing
+
+We welcome contributions! Whether it's bug reports, feature requests, or code contributions, every contribution makes a difference.
 
 **Want to suggest a feature?** Join the discussion on [GitHub Discussions](https://github.com/chichi13/registry-ui/discussions)!
 
-### How to Contribute
+**How to Contribute:**
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feat/amazing-feature`)
-3. **Commit** your changes using [Conventional Commits](https://www.conventionalcommits.org/)
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit your changes using [Conventional Commits](https://www.conventionalcommits.org/)
+4. Push to your branch
+5. Open a Pull Request
 
-   ```
-   feat(ui): add repository deletion confirmation dialog
+Read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
-   Implements a confirmation dialog using Reka UI AlertDialog
-   to prevent accidental repository deletions.
+### Tech Stack
 
-   Closes #42
-   ```
-
-4. **Push** to your branch (`git push origin feat/amazing-feature`)
-5. **Open** a Pull Request
-
-### Development Guidelines
-
-- Read our [Contributing Guidelines](CONTRIBUTING.md)
-- Check existing issues before opening new ones
-- Write clear commit messages using Conventional Commits
-- Add tests for new features when applicable
-
----
+- [Nuxt 4](https://nuxt.com/) - The Intuitive Vue Framework
+- [Reka UI](https://reka-ui.com/) - Accessible, unstyled components
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Zod](https://zod.dev/) - TypeScript-first schema validation
 
 ### Community
 
 - [GitHub Discussions](https://github.com/chichi13/registry-ui/discussions) - Ask questions, share ideas
 - [GitHub Issues](https://github.com/chichi13/registry-ui/issues) - Report bugs and request features
-
-### Tech Stack
-
-- Built with [Nuxt 4](https://nuxt.com/) - The Intuitive Vue Framework
-- UI components powered by [Reka UI](https://reka-ui.com/) - Accessible, unstyled components
-- Styled with [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- Validation with [Zod](https://zod.dev/) - TypeScript-first schema validation
 
 ---
 
