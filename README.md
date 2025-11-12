@@ -82,6 +82,7 @@ Create a `.env` file in the root directory:
 | `NODE_ENV`                 | Yes      | `development`    | Environment mode (`development` or `production`)      |
 | `HOST`                     | Yes      | `127.0.0.1`      | Host to bind                                          |
 | `PORT`                     | Yes      | `3000`           | Port for the application server                       |
+| `NUXT_APP_BASE_URL`        | No       | `/`              | Base URL for sub-path deployments (e.g., `/ui`)       |
 | `REGISTRY_URL`             | Yes      | -                | URL of your Docker Registry V2 API                    |
 | `REGISTRY_USERNAME`        | No       | -                | Username for registry authentication                  |
 | `REGISTRY_PASSWORD`        | No       | -                | Password for registry authentication                  |
@@ -183,6 +184,89 @@ networks:
 
 ---
 
+### Sub-Path Deployment
+
+If you want to host the application at a sub-path (e.g., `docker.myserver.com/ui`), you have **two options**:
+
+#### Option 1: Configure Reverse Proxy to Strip Path (Recommended)
+
+Configure your reverse proxy to **strip the sub-path** before forwarding to the application:
+
+<details>
+<summary><b>Nginx Example - Path Stripping</b></summary>
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name docker.myserver.com;
+
+    # Basic Authentication
+    auth_basic "Docker Registry UI";
+    auth_basic_user_file /path/to/.htpasswd;
+
+    # Registry UI at /ui
+    location /ui/ {
+        # Strip /ui prefix before proxying
+        rewrite ^/ui/(.*) /$1 break;
+
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-User $remote_user;
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Caddy Example - Path Stripping</b></summary>
+
+```caddy
+docker.myserver.com {
+    basicauth /ui/* {
+        admin $2a$14$...
+    }
+
+    handle_path /ui/* {
+        reverse_proxy 127.0.0.1:3000 {
+            header_up X-Forwarded-User {remote_user}
+        }
+    }
+}
+```
+
+</details>
+
+#### Option 2: Configure Application Base URL
+
+Set the `NUXT_APP_BASE_URL` environment variable in your application:
+
+```env
+NUXT_APP_BASE_URL=/ui
+```
+
+**Nginx configuration (no path stripping):**
+
+```nginx
+location /ui/ {
+    proxy_pass http://127.0.0.1:3000/ui/;
+    # ... other proxy headers
+}
+```
+
+**Important Notes:**
+
+- `NUXT_APP_BASE_URL` must start with `/` and **not** end with `/`
+- Valid: `/ui`, `/registry-ui`, `/docker/ui`
+- Invalid: `ui`, `/ui/`, `ui/`
+- Option 1 (path stripping) is recommended for simpler application configuration
+- Option 2 requires rebuilding the application when changing the path
+
+---
+
 ### Docker Deployment
 
 <details>
@@ -202,6 +286,8 @@ services:
       - REGISTRY_USERNAME=admin
       - REGISTRY_PASSWORD=${REGISTRY_PASSWORD}
       - REGISTRY_VERIFY_SSL=true
+      # For sub-path deployments (e.g., /ui), uncomment and set:
+      # - NUXT_APP_BASE_URL=/ui
     # NO ports exposed - use reverse proxy
     restart: unless-stopped
 ```
