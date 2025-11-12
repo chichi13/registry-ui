@@ -8,6 +8,7 @@ Self-hosted • Secure • Mobile-First • No Database Required
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Discussions](https://img.shields.io/github/discussions/chichi13/registry-ui)](https://github.com/chichi13/registry-ui/discussions)
+[![Docker Image](https://ghcr-badge.egpl.dev/chichi13/registry-ui/latest_tag?trim=major&label=ghcr.io)](https://github.com/chichi13/registry-ui/pkgs/container/registry-ui)
 
 [![Nuxt 4](https://img.shields.io/badge/Nuxt-4-00DC82)](https://nuxt.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org/)
@@ -269,6 +270,20 @@ location /ui/ {
 
 ### Docker Deployment
 
+**Pre-built Docker images are available on GitHub Container Registry (GHCR):**
+
+[![Docker Image](https://ghcr-badge.egpl.dev/chichi13/registry-ui/latest_tag?trim=major&label=latest)](https://github.com/chichi13/registry-ui/pkgs/container/registry-ui)
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/chichi13/registry-ui:latest
+```
+
+**Available tags:**
+
+- `latest` - Latest stable release
+- `v1.x.x` - Specific version tags
+
 <details>
 <summary><b>Docker Compose Example</b></summary>
 
@@ -277,7 +292,9 @@ version: '3.8'
 
 services:
   registry-ui:
-    build: .
+    image: ghcr.io/chichi13/registry-ui:latest
+    # Or build locally:
+    # build: .
     environment:
       - HOST=0.0.0.0
       - PORT=3000
@@ -295,11 +312,32 @@ services:
 </details>
 
 <details>
-<summary><b>Building Docker Image</b></summary>
+<summary><b>Using Pre-built Image (Recommended)</b></summary>
+
+```bash
+# Pull and run the latest image from GHCR
+docker run -d \
+  --name registry-ui \
+  -e HOST=0.0.0.0 \
+  -e REGISTRY_URL=https://registry.example.com \
+  -e REGISTRY_USERNAME=admin \
+  -e REGISTRY_PASSWORD=secret \
+  ghcr.io/chichi13/registry-ui:latest
+```
+
+</details>
+
+<details>
+<summary><b>Building Your Own Image</b></summary>
+
+If you prefer to build the image yourself:
 
 ```bash
 # Build the image
 docker build -t registry-ui:latest .
+
+# Or with Podman
+podman build -t registry-ui:latest .
 
 # Run with environment variables
 docker run -d \
