@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Base stage with common workdir
-FROM oven/bun:1 AS base
+FROM docker.io/oven/bun:1 AS base
 WORKDIR /usr/src/app
 
 # Dependencies installation with cache mount
@@ -18,7 +18,7 @@ ENV NODE_ENV=production
 RUN bun run build
 
 # Production release
-FROM node:22-alpine AS release
+FROM docker.io/node:22-alpine AS release
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/.output ./
