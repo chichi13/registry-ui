@@ -65,7 +65,11 @@ const { deleteTag, deleteRepository } = useDockerRegistry()
 const toast = useToast()
 const logger = useAppLogger('pages:repository')
 
-const repositoryName = computed(() => route.params.name as string)
+const repositoryName = computed(() => {
+  const name = route.params.name
+  if (!name) return ''
+  return Array.isArray(name) ? name.join('/') : name
+})
 
 const tags = computed(() => store.getTagsByRepository(repositoryName.value))
 
