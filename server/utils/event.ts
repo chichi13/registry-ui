@@ -146,15 +146,18 @@ export function useRegistryClient() {
 export function getRepositoryName(event: H3Event): string {
   const name = getRouteParam(event, 'name')
 
+  // Decode URL-encoded repository name (handles %2F for slashes)
+  const repositoryName = decodeURIComponent(name)
+
   // Validate repository name format
-  const result = repositoryNameSchema.safeParse(name)
+  const result = repositoryNameSchema.safeParse(repositoryName)
 
   if (!result.success) {
     throw new ValidationError(
-      `Invalid repository name format: ${name}`,
+      `Invalid repository name format: ${repositoryName}`,
       'INVALID_REPOSITORY_NAME',
       {
-        name,
+        name: repositoryName,
         errors: result.error.issues,
       }
     )
