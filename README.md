@@ -1,3 +1,5 @@
+
+
 <div align="center">
 
 # 🐳 Docker Registry UI
@@ -282,7 +284,7 @@ docker pull ghcr.io/chichi13/registry-ui:latest
 **Available tags:**
 
 - `latest` - Latest stable release
-- `v1.x.x` - Specific version tags
+- `vX.Y.Z` - Specific version tags
 
 <details>
 <summary><b>Docker Compose Example</b></summary>
